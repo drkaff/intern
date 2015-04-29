@@ -1,7 +1,8 @@
 import json
+from smtplib import SMTP
+
 from django.db import models
 from django.contrib.auth.models import User
-
 
 
 
@@ -48,3 +49,11 @@ class UserProfile(models.Model):
             skill_lists = skills_list.append(skill) # add item to list
         sk = json.dumps(skills_list) #convert list to string
         self.skills = sk
+
+    #send an email to the user
+    def send_email(self,message):
+        server = smtplib.SMTP("smtp.gmail.com",587) #gmail server
+        server.starttls() #connect to server
+        server.login('snatchtest1@gmail.com','password0864')  #login to server
+        server.sendmail('Snatch',self.user.email,message) # send message
+        server.close() #disconnect from server
