@@ -14,7 +14,7 @@ class UserProfile(models.Model):
         ('em','Employer'),
      )
      #contains username,first_name,last_name,email,and password
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User) #uses the django usertype
     uType = models.CharField(max_length=2,
                               choices=PROFILE_TYPES)
     skills = models.CharField(max_length=300,default=None)
@@ -27,8 +27,13 @@ class UserProfile(models.Model):
     def get_email(self):
         return self.user.email
 
+    #return the username of a user
+    def get_username(self):
+        return self.user.username
+
+
     def __str__(self):
-         return self.user.username #return the username of a user
+         return self.user.username
 
     #get user skills, skills is a string and must be converted to list
     def get_skills(self):
@@ -39,7 +44,8 @@ class UserProfile(models.Model):
         else:
             return None
 
-    #add to skills have to call get skills to get array and then add to it and return to string
+    #add to skills have to call get skills to get array
+    #and then add to it and return to string
     #array of skills added to skill_list
     def add_skills(self,skills):
         skills_list = self.get_skills() #get skill list as list
@@ -55,5 +61,41 @@ class UserProfile(models.Model):
         server = smtplib.SMTP("smtp.gmail.com",587) #gmail server
         server.starttls() #connect to server
         server.login('snatchtest1@gmail.com','password0864')  #login to server
-        server.sendmail('Snatch',self.user.email,message) # send message
-        server.close() #disconnect from server
+        try:
+            server.sendmail('Snatch',self.user.email,message) # send message
+        finally:
+            server.close() #disconnect from server
+
+
+
+
+#A job class
+class job(models.Model):
+    company = models.ForeignKey(UserProfile) #A company owns the job posting
+    title = models.CharField(max_length=100,default=None) #title of job
+    description = models.CharField(max_length=200,default=None) #description of job
+    location = models.CharField(max_length=100,default=None) #location of job
+    skills = models.CharField(max_length=300,default=None)#list of skills
+    added = models.DateTimeField(auto_now_add=True) #when job was listed
+    applied = models.ManyToManyField(UserProfile) #many user can apply to job
+
+    def __str__(self):
+        return self.title
+
+    def get_desription(self):
+        return self.description
+
+    def get_company(self):
+        return self.company
+
+    def get_location(self):
+        return self.loaction
+
+    def get_skills(self):
+        return self.skills
+
+    def get_added(self):
+        return self.added
+
+    def get_applied(self):
+        return self.applied
