@@ -10,8 +10,8 @@ from django.contrib.auth.models import User
 class UserProfile(models.Model):
     #The profile types of every user
     PROFILE_TYPES = (
-        ('in','Intern'),
         ('em','Employer'),
+        ('ap','Applicant'),
      )
      #contains username,first_name,last_name,email,and password
     user = models.OneToOneField(User) #uses the django usertype
@@ -71,6 +71,24 @@ class UserProfile(models.Model):
 
 #A job class
 class job(models.Model):
+
+    #Job level type
+    JOB_LEVEL = (
+        ('in','Internship'),
+        ('en','Entry'),
+        ('ju','Junior'),
+        ('mi','Mid'),
+        ('se','Senior'),
+    )
+
+    #Job length type
+    JOB_TYPE = (
+        ('in','Internship'),
+        ('fl','Full Time'),
+        ('pt','Part Time'),
+        ('ct','Contract'),
+    )
+
     company = models.ForeignKey(UserProfile) #A company owns the job posting
     title = models.CharField(max_length=100,default=None) #title of job
     description = models.CharField(max_length=200,default=None) #description of job
@@ -78,6 +96,9 @@ class job(models.Model):
     skills = models.CharField(max_length=300,default=None)#list of skills
     added = models.DateTimeField(auto_now_add=True) #when job was listed
     applied = models.ManyToManyField(UserProfile) #many user can apply to job
+    level = models.CharField(max_length=2) #level of job
+    job_type = models.CharField(max_length=2) #type of job
+
 
     def __str__(self):
         return self.title
