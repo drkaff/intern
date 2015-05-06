@@ -33,12 +33,20 @@
           <a class="navbar-brand" href="/snatch/">Snatch</a>
         </div>
         <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-right">
-                <li><a href="{% url 'index' %}">Home</a></li>
-                        <li>Register Here</a></li>
-                        <li>Login</a></li>
-              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{% url 'index' %}">Home</a></li>
+                        {% if user.is_authenticated %}
+                          <li>><a href= "{%url 'logout' %}">Logout </a></li>
+                        {% else %}
+                            <li><a href= "{% url 'register' %}"> Register Here</a></li>
+                            <li>><a href= "{%url 'login' %}">Login </a></li>
+                        {% endif %}
+
+                  </ul>
+
+
         </div>
+
       </div>
     </div>
 
