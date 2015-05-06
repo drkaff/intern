@@ -51,7 +51,8 @@ class UserProfile(models.Model):
         finally:
             server.close() #disconnect from server
 
-
+    def __str__(self):
+        return self.user.email()
 
 
 #A job class
@@ -73,7 +74,7 @@ class job(models.Model):
         ('pt','Part Time'),
         ('ct','Contract'),
     )
-
+    #TO DO: ADD PERSONALITY TRAIT/TYPE
     company = models.ForeignKey(UserProfile,related_name = 'company') #A company owns the job posting
     title = models.CharField(max_length=100,default=None) #title of job
     description = models.CharField(max_length=200,default=None) #description of job
