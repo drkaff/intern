@@ -14,10 +14,10 @@ class UserProfile(models.Model):
         ('ap','Applicant'),
      )
      #contains username,first_name,last_name,email,and password
-    user = models.OneToOneField(User) #uses the django usertype
+    user = models.OneToOneField(User,null=True) #uses the django usertype
     uType = models.CharField(max_length=2,
                               choices=PROFILE_TYPES)
-    skills = models.CharField(max_length=300,default=None)
+    skills = models.CharField(max_length=300,default="")
 
 
     #get user skills, skills is a string and must be converted to list
