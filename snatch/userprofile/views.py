@@ -42,6 +42,17 @@ def user_login(request):
         password = request.POST.get('password')
         user = authenticate(username=username,password=password)
 
+        if user:
+            if  user.is_active:
+                login(request,user)
+                return HttpResponseRedirect('/snatch/')
+            else:
+                return HttpResponse("Your snatch account is disabled")
+        else:
+            print "Invalid login details: {0}, {1}".format(username,password)
+            return HttpResponse("Invalid login details supplied.")
+    else:
+            return render(request,'snatch/login.html',{})
 
 
 @login_required
