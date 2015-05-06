@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
-from userprofile.forms import  UserForm, UserProfileForm
+from userprofile.forms import  UserForm, UserProfileForm, CreateJobForm
 def index(request):
     return render(request,'snatch/index.html',{})
 
@@ -30,7 +30,17 @@ def register(request):
     {'user_form':user_form,'profile_form':profile_form,'registered':registered})
 
 
-
+#Create a Job posting
+def create_job(request):
+    if request.method == "POST":
+        form = CreateJobForm(request.POST)
+        if form.is_valid():
+            form.save(commit=True)
+        else:
+            print form.errors
+    else:
+        form = CategoryForm()
+    return render(request,'snatch/add_job.html',{'form':form})
 
 
 

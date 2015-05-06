@@ -15,7 +15,7 @@ class UserProfile(models.Model):
      )
      #contains username,first_name,last_name,email,and password
     user = models.OneToOneField(User,null=True) #uses the django usertype
-    uType = models.CharField(max_length=2,
+    user_type = models.CharField(max_length=2,
                               choices=PROFILE_TYPES)
     skills = models.CharField(max_length=300,default="")
 
@@ -56,7 +56,7 @@ class UserProfile(models.Model):
 
 
 #A job class
-class job(models.Model):
+class Job(models.Model):
 
     #Job level type
     JOB_LEVEL = (
