@@ -43,9 +43,14 @@ def register(request):
 @login_required
 def create_job(request):
     if request.method == "POST":
-        form = CreateJobForm(request.POST)
+        form = CreateJobForm(data=request.POST)
         if form.is_valid():
-            form.save(commit=True)
+            f = form.save(commit=False)
+            user = User.objects.get(username=request.user)
+            profile = UserProfile.objects.get(user=user)
+            f.company = profile
+            f.save()
+
         else:
             print (form.errors)
     else:
