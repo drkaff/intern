@@ -14,9 +14,9 @@ class UserProfile(models.Model):
         ('ap','Applicant'),
      )
      #contains username,first_name,last_name,email,and password
-    user = models.OneToOneField(User,null=True) #uses the django usertype
+    user = models.ForeignKey(User,null=True) #uses the django usertype
     user_type = models.CharField(max_length=2,
-                              choices=PROFILE_TYPES)
+                              choices=PROFILE_TYPES,default="")
     skills = models.CharField(max_length=300,default="")
 
 

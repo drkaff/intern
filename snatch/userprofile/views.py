@@ -1,8 +1,12 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login,logout
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from userprofile.forms import  UserForm, UserProfileForm, CreateJobForm
+from django.shortcuts import get_object_or_404
+from userprofile.models import UserProfile
+from django import template
 def index(request):
     return render(request,'snatch/index.html',{})
 
@@ -16,13 +20,16 @@ def register(request):
         user_form = UserForm(data=request.POST)
         profile_form = UserProfileForm(data=request.POST)
         if user_form.is_valid() and profile_form.is_valid():
+            username = request.POST.get('username')
             user = user_form.save()
             user.set_password(user.password)
             user.save()
             profile = profile_form.save(commit=False)
-            profile.user = user
-            profile.save()
+            x = UserProfile.objects.get(user = user)
+            x.user_type = profile.user_type
+            x.save()
             registered = True
+
         else:
             print (user_form.errors,profile_form.errors)
     else:
@@ -44,7 +51,6 @@ def create_job(request):
     else:
         form = CreateJobForm()
     return render(request,'snatch/add_job.html',{'form':form})
-
 
 
 

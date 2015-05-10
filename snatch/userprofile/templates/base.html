@@ -35,14 +35,16 @@
         <div class="navbar-collapse collapse">
               <ul class="nav navbar-nav navbar-right">
                     <li><a href="{% url 'index' %}">Home</a></li>
-                        {% if user.is_authenticated %}
-                          <li>><a href="{% url 'auth_logout' %}?next=/snatch/">Logout</a></li>
-                        {% else %}
-                            <li> <a href="{% url 'registration_register' %}"> Register Here</a></li>
-                            <li>><a href="{% url 'auth_login' %}">Login Here</a></li>
+                    {% if user.is_authenticated %}
+                          <li><a href="/snatch/logout/">Logout</a></li>
+                          {% load app_filters %}
+                          {% if user|has_type:"em" %}<li><a href="/snatch/create_job/">Post Job</a></li>
+                           {% endif %}
+                    {% else %}
+                        <li><a href="/snatch/register/">Register Here</a></li>
+                        <li><a href="/snatch/login/">Login</a></li>
                         {% endif %}
-
-                  </ul>
+                      </ul>
 
 
         </div>
