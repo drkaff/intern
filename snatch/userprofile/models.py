@@ -3,7 +3,7 @@ from smtplib import SMTP
 
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.db.models.signals import post_save
 
 
 #User Profile page
@@ -52,8 +52,14 @@ class UserProfile(models.Model):
             server.close() #disconnect from server
 
     def __str__(self):
-        return self.user.email()
+        return self.user.username
 
+
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+post_save.connect(create_user_profile, sender=User)
 
 #A job class
 class Job(models.Model):
@@ -76,14 +82,14 @@ class Job(models.Model):
     )
     #TO DO: ADD PERSONALITY TRAIT/TYPE
     company = models.ForeignKey(UserProfile,related_name = 'company') #A company owns the job posting
-    title = models.CharField(max_length=100,default=None) #title of job
-    description = models.CharField(max_length=200,default=None) #description of job
-    location = models.CharField(max_length=100,default=None) #location of job
-    skills = models.CharField(max_length=300,default=None)#list of skills
+    title = models.CharField(max_length=100,default="") #title of job
+    description = models.CharField(max_length=200,default="") #description of job
+    location = models.CharField(max_length=100,default="") #location of job
+    skills = models.CharField(max_length=300,default="")#list of skills
     added = models.DateTimeField(auto_now_add=True) #when job was listed
     applied = models.ManyToManyField(UserProfile,related_name = 'applicants') #many user can apply to job
-    level = models.CharField(max_length=2) #level of job
-    job_type = models.CharField(max_length=2) #type of job
+    level = models.CharField(max_length=2,choices=JOB_LEVEL) #level of job
+    job_type = models.CharField(max_length=2,choices=JOB_TYPE) #type of job
 
 
     def __str__(self):

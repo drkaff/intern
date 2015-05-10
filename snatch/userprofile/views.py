@@ -10,6 +10,7 @@ def index(request):
 
 
 def register(request):
+
     registered = False
     if request.method == 'POST':
         user_form = UserForm(data=request.POST)
@@ -19,10 +20,11 @@ def register(request):
             user.set_password(user.password)
             user.save()
             profile = profile_form.save(commit=False)
+            profile.user = user
             profile.save()
             registered = True
         else:
-            print user_form.errors,profile_form.errors
+            print (user_form.errors,profile_form.errors)
     else:
         user_form = UserForm()
         profile_form = UserProfileForm()
@@ -31,15 +33,16 @@ def register(request):
 
 
 #Create a Job posting
+@login_required
 def create_job(request):
     if request.method == "POST":
         form = CreateJobForm(request.POST)
         if form.is_valid():
             form.save(commit=True)
         else:
-            print form.errors
+            print (form.errors)
     else:
-        form = CategoryForm()
+        form = CreateJobForm()
     return render(request,'snatch/add_job.html',{'form':form})
 
 
@@ -59,7 +62,7 @@ def user_login(request):
             else:
                 return HttpResponse("Your snatch account is disabled")
         else:
-            print "Invalid login details: {0}, {1}".format(username,password)
+            print ("Invalid login details: {0}, {1}".format(username,password))
             return HttpResponse("Invalid login details supplied.")
     else:
             return render(request,'snatch/login.html',{})
@@ -67,5 +70,7 @@ def user_login(request):
 
 @login_required
 def user_logout(request):
+
+    print (request.user)
     logout(request)
     return HttpResponseRedirect('/snatch/')

@@ -9,7 +9,7 @@ class UserForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('username','email','first_name','last_name','password')
+        fields = ('username','email','password')
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
@@ -22,4 +22,4 @@ class CreateJobForm(forms.ModelForm):
     location = forms.CharField(max_length=100,help_text="Enter job location") #location of job
     class Meta:
         model = Job
-        fields = ('title','description','location')
+        fields = ('title','description','location','level','job_type')

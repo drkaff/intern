@@ -1,1 +1,16 @@
 {% extends 'base.html' %}
+{% block title %}Index{% endblock %}
+
+        {% block body_block %}
+{% if user.is_authenticated %}
+    <div class="page-header">
+
+                <h1>Hello {{ user.username }} You are {{ user.get_profile.user_type }}!</h1>
+            {% else %}
+                <h1>Welcome To Snatch!</h1>
+            {% endif %}
+
+
+</div>
+
+{% endblock %}
