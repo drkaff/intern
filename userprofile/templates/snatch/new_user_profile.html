@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+
+{% block body_block %}
+        <h1>Create Profile</h1>
+        {% if posted %}
+        Snatch says: <strong>Profile Successfully Created!</strong>
+        <a href="/snatch/">Return to the homepage</a><br />
+        {% else %}
+        {% load app_filters %}
+        {% if user|has_type:"em" %}
+        <form id="create_company_form" method="post" action="/snatch/create_company_profile/" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ name|bootstrap }}
+              {{ form|bootstrap }}
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+          </form>
+
+
+
+        {%else%}
+        <form id="create_profile_form" method="post" action="/snatch/create_user_profile/" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ name|bootstrap }}
+              {{ form|bootstrap }}
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+          </form>
+          {%endif%}
+          {%endif%}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+
+{% load staticfiles %}
+{% load bootstrap %}
+{% block title %}{{ category_name }}{% endblock %}
+
+{% block body_block %}
+        <h1>Register with Snatch</h1>
+
+        {% if registered %}
+        Snatch says: <strong>thank you for registering!</strong>
+        <a href="/snatch/">Return to the homepage.</a><br />
+        {% else %}
+        <form id="user_form" method="post" action="/snatch/register/"
+                enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <!-- Display each form. The as_p method wraps each element in a paragraph
+                 (<p>) element. This ensures each element appears on a new line,
+                 making everything look neater. -->
+            {{ user_form|bootstrap}}
+            {{ profile_form|bootstrap }}
+
+            <!-- Provide a button to click to submit the form. -->
+            <input type="submit" value="Register" class="btn btn-large btn-primary" />
+        </form>
+        {% endif %}
+        {% endblock %}

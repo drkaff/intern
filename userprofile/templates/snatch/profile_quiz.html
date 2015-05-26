@@ -1,0 +1,94 @@
+{%extends "base.html" %}
+{% load staticfiles %}
+{% block body_block%}
+
+<div id="menu">
+    <ul>
+        <li><a href="/snatch/profile/">Profile Page</a></li>
+        <li class="current_page_item"><a href="../profile/profile_quiz">My Quizzes</a></li>
+    </ul>
+</div>
+<div id="page">
+	<div id="page-bg">
+		<!-- start content -->
+		<div id="content">
+			<div class="post">
+				<h2 class="title"><a href="#">{{ name }}</a></h2>
+				<div class="entry">
+                {% block primary4 %}
+                <img src="{% static image%}" alt="" width="140" height="165" class="left" />
+				
+				<p><strong>About me:</strong><br /> {{ description }}</p>
+                {% endblock %}
+
+				</div>
+				<p class="links"><a href="#" class="more">Upload Job Posting</a></p>
+				
+			</div>
+			<div class="post">
+				<h2 class="referral"><a href="#">Quizzes</a></h2>
+				&nbsp;
+				<div class="entry">
+					<form action="" method="POST">{{ quiz}} <input id="submit" type="submit" name="submit" value="Update" /></form>
+                    <form action="" method="POST">{{ quiz}} <input id="submit" type="submit" name="submit" value="Update" /></form>
+				</div>
+				
+			</div>
+		</div>
+		<!-- end content -->
+		<!-- start sidebar -->
+		<div id="sidebar">
+
+          	{% block title %}<p>Edit Profile for {{ name }}</p>{% endblock %}
+        	{% block content %}
+
+            <form action="" method="POST">{{ form }} <input id="submit" type="submit" name="submit" value="Update" /></form>
+			<form action="changePassword/" method="POST"> {% csrf_token %} <input id="submit" type="submit" name="submit" value="Change Password" /></form>
+
+            {% endblock content %}
+			<ul>
+				<li>
+                    {% block content2 %}
+					<h2><a href="#">Search For Applicants >></a></h2>
+					<ul>
+                      {% for jobs in latest %}
+						<li><a href="{{job.avail}}">{{user.jobs.avail}}</a></li>
+                        <li><a href="{{job.avail}}">{{user.jobs.avail}}</a></li>
+                        <li><a href="{{job.avail}}">{{user.jobs.avail}}</a></li>
+                        <li><a href="{{job.avail}}">{{user.jobs.avail}}</a></li>
+                        <li><a href="{{job.avail}}">{{user.jobs.avail}}</a></li>
+					  {%endfor%}
+                    </ul>
+				</li>
+                  {% endblock%}
+				<li>
+                	<h2><a href="#">{% block title3 %}Notifications>>{% endblock %}</a></h2>
+
+                    {% block primary2 %}
+					{% for notification in latest %}
+					<h2>Notifications</h2>
+					<ul>
+                    		{% for user in notifications %}
+						 <li><a href="{{url.user}}">{{ user }}</a> posted a new {{ notification.type }} <a href="{{user.notification.url}}">view >></a></li>
+						 <li><a href="{{url.user}}">{{ user }}</a> posted a new {{ notification.type }} <a href="{{user.notification.url}}">view >></a></li>
+						 <li><a href="{{url.user}}">{{ user }}</a> posted a new {{ notification.type }} <a href="{{user.notification.url}}">view >></a></li>
+						 <li><a href="{{url.user}}">{{ user }}</a> posted a new {{ notification.type }} <a href="{{user.notification.url}}">view >></a></li>
+                        	 {% endfor %}
+					</ul>
+                	   {% endfor %}
+                     {% endblock %}
+
+				</li>
+			</ul>
+		</div>
+		<!-- end sidebar -->
+		<div style="clear: both;">&nbsp;</div>
+	</div>
+</div>
+<!-- end page -->
+
+
+</div>
+
+{% endblock %}
+

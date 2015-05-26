@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Index{% endblock %}
+
+        {% block body_block %}
+{% if user.is_authenticated %}
+    <div class="page-header">
+		<center>
+                <h1>Hello {{ user.username }}!</h1>
+                {% load app_filters %}
+              {%if profile.registered %}
+                <p>REGISTERED</p>
+                {%endif %}
+              {% if user|has_type:"em" %} <p>User is employee</p>
+                  {% else %} <p>User is an applicant</p>
+                 {% endif %}
+            {% else %}
+                <h1>Welcome To Snatch!</h1>
+            {% endif %}
+
+		</center>
+</div>
+
+{% endblock %}

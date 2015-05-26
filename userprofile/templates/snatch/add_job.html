@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+
+{% block body_block %}
+        <h1>Post a Job</h1>
+        {% if posted %}
+        Snatch says: <strong>Job Successfully Posted!</strong>
+        <a href="/snatch/">Return to the homepage</a><br />
+        <a href="/snatch/create_job">Post Another Job</a><br/>
+        {% else %}
+        <form id="create_job_form" method="post" action="/snatch/create_job/">
+              {% csrf_token %}
+              {{ form|bootstrap }}
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+          </form>
+          {%endif%}
+{% endblock %}

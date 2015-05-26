@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{%block head%}
+<style>
+	.login-page {
+	  margin: 0;
+	  padding: 0;
+	  background: #fff;
+	  font-family: Arial,Verdana,sans-serif;
+	  color: #444;
+	}
+
+	.centered-column {
+	  width: 960px;
+	  margin: 0 auto;
+	  position: relative;
+	}
+	.login-form {
+	  background-color: #eee;
+	  float: right;
+	  position: relative;
+	  padding-left: 43px;
+	  width: 365px;
+	  padding-top: 15px;
+	  padding-bottom: 36px;
+	}
+</style>
+{%enblock%}
+
+{% block title %}{{ category_name }}{% endblock %}
+<div class="login-page">
+{% block body_block %}
+<div class="centered-column">
+        <h1>Login to Snatch</h1>
+		<div class="centered-column">
+        <form id="login_form" method="post" action="/snatch/login/">
+            {% csrf_token %}
+            Username: <input type="text" name="username" value="" size="50" />
+            <br />
+            Password: <input type="password" name="password" value="" size="50" />
+            <br />
+
+            <input type="submit" value="submit" />
+        </form>
+		</div>
+</div>
+</div>
+{% endblock %}
