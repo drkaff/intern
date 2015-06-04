@@ -26,3 +26,6 @@ def has_registered(user,registered):
         return True
     else:
         return False
+
+'''@register.fileter(name="is_resume")
+def is_resume(form):'''

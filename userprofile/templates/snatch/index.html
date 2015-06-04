@@ -4,7 +4,7 @@
         {% block body_block %}
 {% if user.is_authenticated %}
     <div class="page-header">
-		<center>
+
                 <h1>Hello {{ user.username }}!</h1>
                 {% load app_filters %}
               {%if profile.registered %}
@@ -17,7 +17,7 @@
                 <h1>Welcome To Snatch!</h1>
             {% endif %}
 
-		</center>
+
 </div>
 
 {% endblock %}

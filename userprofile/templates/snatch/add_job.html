@@ -12,6 +12,13 @@
         <form id="create_job_form" method="post" action="/snatch/create_job/">
               {% csrf_token %}
               {{ form|bootstrap }}
+              <select class="form-control" name="state">
+                {%for state in states%}
+                <option value="{{state}}">{{state}}</option>
+                {%endfor%}
+              </select>
+              <br>
+              <br>
               <div class="form-group">
                 <button type="submit" class="btn btn-primary">Submit</button>
               </div>

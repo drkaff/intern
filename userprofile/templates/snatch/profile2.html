@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+-->
+{% load staticfiles %}
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>{%block pagetitle %}{% endblock %} | Snatch.com</title>
+<link href="{% static "css/default.css" %}" rel="stylesheet" type="text/css" media="screen" />
+</head>
+
+
+
+<body>
+<!-- start header -->
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+            <div id="logo">
+                <h1><a class="navbar-brand" href="{% url 'index' %}">Snatch™!</a></h1>
+                <p>Your perfect Snatch™ is out there</p>
+            </div>
+        </div>
+
+        <div id="menu">
+            <ul>
+                <li class="current_page_item"><a href="../snatch/profile.html">Profile Page</a></li>
+                <li><a href="/snatch/profile_quiz/">My Quizzes</a></li>
+            </ul>
+        </div>
+<!-- end header -->
+<!-- start page -->
+<div id="page">
+	<div id="page-bg">
+		<!-- start content -->
+		<div id="content">
+			<div class="post">
+				<h2 class="title"><a href="#">{{ name }}</a></h2>
+				<div class="entry">
+              {% block primary %}
+
+				<p><strong><img src="{%static image%}" alt="" width="140" height="165" class="left" />Description:</strong><br /> {{description }}</p>
+
+                {% endblock %}
+				</div>
+				<p class="links"><a href="#" class="more">Upload Resume</a> &nbsp; <a href="#" class="comments">Hide/Show Referals</a></p>
+			</div>
+			<div class="post">
+				<h2 class="title"><a href="#">Referals</a></h2>
+				&nbsp;
+				<div class="entry">
+
+					<h3>What people are saying about you</h3>
+					<blockquote>{{ user1.referrer.post }}<br />- {{ user1.referrer }}</blockquote>
+                    <blockquote>{{ user2.referrer.post }}<br />- {{ user2.referrer }}</blockquote>
+				</div>
+				<p class="links"><a href="{{ url.referrerRequest }}" class="more">Request Referal >></a></p>
+			</div>
+		</div>
+		<!-- end content -->
+		<!-- start sidebar -->
+		<div id="sidebar">
+
+			<ul>
+				<li>
+					<h2><a href="#">Edit contact info for {{ user }}</a></h2>
+				</li>
+				<li>
+                	{% block title %}Search For Jobs{% endblock %}
+                    {% block content %}
+
+
+					<h2><a href="#">Search For Jobs >></a></h2>
+					<ul>
+                     <!-- {% for jobs in latest %}-->
+						<li><a href="{{job.avail}}">{{user.jobs.avail}}</a></li>
+                        <li><a href="{{job.avail}}">{{user.jobs.avail}}</a></li>
+                        <li><a href="{{job.avail}}">{{user.jobs.avail}}</a></li>
+                        <li><a href="{{job.avail}}">{{user.jobs.avail}}</a></li>
+                        <li><a href="{{job.avail}}">{{user.jobs.avail}}</a></li>
+					  <!--{%endfor%}-->
+                    </ul>
+				</li>
+                  <!--{% endblock content %}			-->
+				<li>
+                <!--	{% block title2 %}Notifications{% endblock %}
+
+                    {% block primary2 %}
+					{% for notification in latest %} -->
+					<h2>Notifications</h2>
+					<ul>
+                    	<!--	{% for user in notifications %}-->
+						 <li><a href="{{url.user}}">{{ user }}</a> posted a new {{ notification.type }} <a href="{{user.notification.url}}">view >></a></li>
+						 <li><a href="{{url.user}}">{{ user }}</a> posted a new {{ notification.type }} <a href="{{user.notification.url}}">view >></a></li>
+						 <li><a href="{{url.user}}">{{ user }}</a> posted a new {{ notification.type }} <a href="{{user.notification.url}}">view >></a></li>
+						 <li><a href="{{url.user}}">{{ user }}</a> posted a new {{ notification.type }} <a href="{{user.notification.url}}">view >></a></li>
+                        <!--	 {% endfor %}-->
+					</ul>
+                <!--	   {% endfor %}
+                   {% endblock %}-->
+				</li>
+			</ul>
+		</div>
+		<!-- end sidebar -->
+		<div style="clear: both;">&nbsp;</div>
+	</div>
+</div>
+<!-- end page -->
+<div id="footer">
+	<p>&copy;2015 All Rights Reserved. &nbsp;&bull;&nbsp; Design by Kyle.</p>
+</div>
+</body>
+</html>

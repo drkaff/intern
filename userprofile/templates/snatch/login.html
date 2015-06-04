@@ -25,25 +25,67 @@
 	  padding-top: 15px;
 	  padding-bottom: 36px;
 	}
+	.login{
+	  padding: 15px;
+	  width: 400px;
+	  min-height: 400px;
+	  margin: 2% auto 0 auto;
+	}
+	.login .heading {
+	  text-align: center;
+	  margin-top: 1%;
+	}
+	.login .heading h2 {
+	  font-size: 3em;
+	  font-weight: 300;
+	  color: rgba(255, 255, 255, 0.7);
+	  display: inline-block;
+	  padding-bottom: 5px;
+	  text-shadow: 1px 1px 3px #23203b;
+	}
+	.login form input.form-control {
+	  display: block;
+	  width: auto;
+	  height: auto;
+	  border: none;
+	  outline: none;
+	  box-shadow: none;
+	  background: none;
+	  border-radius: 0px;
+	  padding: 10px;
+	  font-size: 1.6em;
+	  width: 100%;
+	  background: transparent;
+	  color: #c2b8b1;
+	}
+	.login form .input-group span {
+	  background: transparent;
+	  min-width: 53px;
+	  border: none;
+	}
 </style>
 {%enblock%}
 
 {% block title %}{{ category_name }}{% endblock %}
-<div class="login-page">
 {% block body_block %}
-<div class="centered-column">
-        <h1>Login to Snatch</h1>
+	<div class="login">
+	  <div class="heading">
+	    <h2>Sign in</h2>
 		<div class="centered-column">
         <form id="login_form" method="post" action="/snatch/login/">
             {% csrf_token %}
-            Username: <input type="text" name="username" value="" size="50" />
-            <br />
-            Password: <input type="password" name="password" value="" size="50" />
-            <br />
+			<div class="input-group input-group-lg">
+			<span class="input-group-addon"><i class="fa fa-user"></i></span>
+            <input type="text" name="Username" value="" size="50" />
+            </div>
+			<div class="input-group input-group-lg">
+			<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+            <input type="password" name="Password" value="" size="50" />
+        	</div>
 
-            <input type="submit" value="submit" />
+            <input type="submit" value="submit" class="float"/>
         </form>
 		</div>
-</div>
-</div>
+	  </div>
+	</div>
 {% endblock %}

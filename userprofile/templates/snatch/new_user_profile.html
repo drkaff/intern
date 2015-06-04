@@ -1,15 +1,68 @@
 {% extends 'base.html' %}
 
 {% load bootstrap %}
+{%block head%}
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script>
+$(function() {
+  var availableTags = [];
+  {% for l in languages %}
+    availableTags.push("{{ l }}");
+  {%endfor%}
+
+  function split( val ) {
+    return val.split( /,\s*/ );
+  }
+  function extractLast( term ) {
+    return split( term ).pop();
+  }
+
+  $( "#tags" )
+    // don't navigate away from the field on tab when selecting an item
+    .bind( "keydown", function( event ) {
+      if ( event.keyCode === $.ui.keyCode.TAB &&
+          $( this ).autocomplete( "instance" ).menu.active ) {
+        event.preventDefault();
+      }
+    })
+    .autocomplete({
+      minLength: 0,
+      source: function( request, response ) {
+        // delegate back to autocomplete, but extract the last term
+        response( $.ui.autocomplete.filter(
+          availableTags, extractLast( request.term ) ) );
+      },
+      focus: function() {
+        // prevent value inserted on focus
+        return false;
+      },
+      select: function( event, ui ) {
+        var terms = split( this.value );
+        // remove the current input
+        terms.pop();
+        // add the selected item
+        terms.push( ui.item.value );
+        // add placeholder to get the comma-and-space at the end
+        terms.push( "" );
+        this.value = terms.join( ", " );
+        return false;
+      }
+    });
+});
+</script>
+{%endblock%}
 
 {% block body_block %}
-        <h1>Create Profile</h1>
+        <h1>{{title}}</h1>
         {% if posted %}
         Snatch says: <strong>Profile Successfully Created!</strong>
         <a href="/snatch/">Return to the homepage</a><br />
         {% else %}
         {% load app_filters %}
         {% if user|has_type:"em" %}
+
         <form id="create_company_form" method="post" action="/snatch/create_company_profile/" enctype="multipart/form-data">
               {% csrf_token %}
               {{ name|bootstrap }}
@@ -19,17 +72,21 @@
               </div>
           </form>
 
-
-
-        {%else%}
+          {%else%}
         <form id="create_profile_form" method="post" action="/snatch/create_user_profile/" enctype="multipart/form-data">
               {% csrf_token %}
               {{ name|bootstrap }}
               {{ form|bootstrap }}
+              <div class="ui-widget">
+                <label for="skills">Enter Skills:</label>
+                <input name="skills" id="tags" size="50" class="form-control">
+              </div>
+              <br>
               <div class="form-group">
                 <button type="submit" class="btn btn-primary">Submit</button>
               </div>
           </form>
           {%endif%}
+
           {%endif%}
 {% endblock %}

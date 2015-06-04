@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load bootstrap %}
+
+{% load staticfiles %}
+
+{% block title %}{{ category_name }}{% endblock %}
+
+{% block body_block %}
+        <h1>Send an Email</h1>
+
+        <form id="user_form" method="post" action="/snatch/sendReferral/"
+                enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <!-- Display each form. The as_p method wraps each element in a paragraph
+                 (<p>) element. This ensures each element appears on a new line,
+                 making everything look neater. -->
+            {{ change_pass_user_form|bootstrap}}
+
+            <!-- Provide a button to click to submit the form. -->
+            <input type="submit" value="Send Email!" class="btn btn-large btn-primary" />
+        </form>
+        {% endblock %}

@@ -1,13 +1,13 @@
 import json
 from smtplib import SMTP
-
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
+from pygments.lexers import get_all_lexers
+from pygments.lexers import get_lexer_by_name
 
-
-
-
+LEXERS = [item for item in get_all_lexers() if item[1]]
+LANGUAGE_CHOICES = sorted([(item[1][0], item[0]) for item in LEXERS])
 
 def upload_to_img(instance, filename):
     return 'userprofile/static/files/%s/profile/%s' % (instance.user.username, filename)
@@ -24,7 +24,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User) #uses the django usertype
     user_type = models.CharField(max_length=2,
                               choices=PROFILE_TYPES,default="")
-    skills = models.CharField(max_length=300,default="")
+    skills = models.CharField(max_length=300)#list of skills
     description = models.CharField(max_length=300,default="")
     resume = models.FileField(null=True,upload_to=upload_to_img) #holds the resume
     profile_picture = models.ImageField(default='files/default.jpeg',upload_to=upload_to_res)
@@ -32,11 +32,14 @@ class UserProfile(models.Model):
     #get user skills, skills is a string and must be converted to list
     def get_skills(self):
         if (self.skills is not None):
-            jsonDec = json.decoder.JSONDecoder()
-            skillsList = jsonDec.decode(self.skills) #convert string to list
-            return skillsList
-        else:
-            return None
+            skills = self.skills
+            skills = str(skills)
+            skills = skills.replace(' ','')
+            skills = skills.split(',')
+            skills.pop()
+            return skills
+
+        return None
 
     #add to skills have to call get skills to get array
     #and then add to it and return to string
@@ -95,11 +98,13 @@ class Job(models.Model):
         ('ct','Contract'),
     )
     #TO DO: ADD PERSONALITY TRAIT/TYPE
+
+
     company = models.ForeignKey(UserProfile,related_name = 'company') #A company owns the job posting
     title = models.CharField(max_length=100,default="") #title of job
     description = models.CharField(max_length=200,default="") #description of job
     location = models.CharField(max_length=100,default="") #location of job
-    skills = models.CharField(max_length=300,default="")#list of skills
+    skills = models.CharField(max_length=300,choices=LANGUAGE_CHOICES)#list of skills
     added = models.DateTimeField(auto_now_add=True) #when job was listed
     applied = models.ManyToManyField(UserProfile,related_name = 'applicants') #many user can apply to job
     level = models.CharField(max_length=2,choices=JOB_LEVEL) #level of job
@@ -108,3 +113,7 @@ class Job(models.Model):
 
     def __str__(self):
         return self.title
+
+
+    def get_absolute_url(self):
+        return "/snatch/job%s" % self.id

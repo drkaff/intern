@@ -3,15 +3,28 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse, HttpResponseRedirect
-from userprofile.forms import  UserForm, UserProfileForm, CreateJobForm, CreateProfileForm,NamesProfileForm, CompanyNameForm, CompanyProfileForm,ChangePasswordUserForm
+from userprofile.forms import  *
 from userprofile.models import UserProfile,Job
 from django_tables2 import RequestConfig
 from userprofile.tables import CompanyJobsTable, AppJobsTable
+from smtplib import SMTP
 import os
+from pygments.lexers import get_all_lexers
+from pygments.lexers import get_lexer_by_name
+
+
 
 
 def index(request):
-    return render(request,'snatch/index.html')
+    if request.user.is_authenticated():
+        user = User.objects.get(username=request.user)
+        up = UserProfile.objects.get(user=user)
+        if(up.registered == True):
+            return profile(request)
+        else:
+            return render(request,'snatch/index.html')
+    else:
+        return render(request,'snatch/home.html')
 
 def denied(request):
     return render(request,'snatch/denied.html',{})
@@ -19,13 +32,6 @@ def denied(request):
 def quiz(request):
     return render(request,'snatch/profile_quiz.html',{})
 
-@login_required
-def picture(request):
-    user = User.objects.get(username = request.user)
-    profile = UserProfile.objects.get(user=user)
-    image = profile.profile_picture
-    image = image.url[19:]
-    return render(request,'snatch/picture.html',{'image':image})
 
 @login_required
 def company_profile(request,company_id):
@@ -36,27 +42,45 @@ def company_profile(request,company_id):
     fname = user.first_name
     name = fname
     image = image.url[19:]
-    return render(request,'snatch/profile.html',{'image':image,'description':description,'name':name})
-
-
+    company = True
+    return render(request,'snatch/profile.html',{'image':image,'description':description,'name':name,'company':company,'company_id':company_id})
 
 
 @login_required
 def profile(request):
     user = User.objects.get(username = request.user)
     profile = UserProfile.objects.get(user=user)
+    pid = profile.id
     image = profile.profile_picture
     description = profile.description
     fname = user.first_name
     lname = user.last_name
     name = fname + " " + lname
     image = image.url[19:]
-    return render(request,'snatch/profile.html',{'image':image,'description':description,'name':name})
+    skills = profile.skills
+    skills = skills.split(',')
+    if(skills[len(skills)-1] == " "):
+        skills.pop()
+    is_company = profile.user_type
+    if(is_company=="em"):
+        company = True
+    else:
+        company = False
+    return render(request,'snatch/profile.html',{'image':image,'description':description,'name':name,'company':company,'skills':skills,'pid':pid})
 
 #this is a change
 #A compnay's job page
 @login_required
-def company_jobs(request):
+def company_jobs(request,company_id):
+    profile = UserProfile.objects.get(pk=company_id)
+    jobs = Job.objects.filter(company=profile)
+    table = CompanyJobsTable(jobs)
+    RequestConfig(request).configure(table)
+    print company_id
+    return render(request, 'snatch/view_jobs.html', {'table': table,'company_id':company_id})
+
+@login_required
+def company_only_jobs(request):
     user = User.objects.get(username=request.user)
     profile = UserProfile.objects.get(user=user)
     jobs = Job.objects.filter(company=profile)
@@ -72,6 +96,16 @@ def view_jobs(request):
     RequestConfig(request).configure(table)
     return render(request, 'snatch/view_jobs.html',{'table':table, 'jobs':jobs})
 
+#view applied to jobs
+@login_required
+def view_applied(request):
+    user = User.objects.get(username=request.user)
+    profile = UserProfile.objects.get(user=user)
+    jobs = Job.objects.all().filter(applied=profile)
+    table = AppJobsTable(jobs)
+    return render(request, 'snatch/view_jobs.html',{'table':table, 'jobs':jobs})
+
+
 
 #View for individual job
 @login_required
@@ -82,7 +116,6 @@ def job(request,job_id):
     owner = False
     if(job.company == up):
         owner = True
-    print owner
     return render(request,'snatch/job.html',{'job':job,'owner':owner})
 
 
@@ -153,13 +186,16 @@ def handle_uploaded_file(file_path,is_resume,username):
     dest.close()
     return p
 
-
 @login_required
 def create_user_profile(request):
+    update = False
     posted = False
+    title = "Create Profile"
+    languages = getLanguages()
     if request.method == "POST":
         form = CreateProfileForm(request.POST, request.FILES)
         name = NamesProfileForm(data=request.POST)
+        languages = getLanguages()
         if form.is_valid() and name.is_valid():
             res = handle_uploaded_file(request.FILES['resume'],True,request.user)
             pic = handle_uploaded_file(request.FILES['profile_picture'],False,request.user)
@@ -184,16 +220,89 @@ def create_user_profile(request):
     else:
         name = NamesProfileForm()
         form = CreateProfileForm()
-    return render(request,'snatch/new_user_profile.html',{'name' : name,'form':form,'posted':posted})
+    return render(request,'snatch/new_user_profile.html',{'name' : name,'form':form,'posted':posted,'title':title,'update':update,'languages':languages})
 
+
+def getLanguages():
+    LEXERS = [item for item in get_all_lexers() if item[1]]
+    LANGUAGE_CHOICES = sorted([(item[1][0], item[0]) for item in LEXERS])
+    languages = []
+    for i in LANGUAGE_CHOICES:
+        languages.append("%s" % i[0])
+    return languages
+
+
+@login_required
+def update_user_profile(request):
+    update = True
+    user = User.objects.get(username=request.user)
+    profile = UserProfile.objects.get(user=user)
+    form = CreateProfileForm()
+    posted = False
+    title = "Update Profile"
+    languages = getLanguages()
+    userSkills = profile.skills
+    print languages
+    if request.method == "POST":
+        form = CreateProfileForm(request.POST,instance=profile)
+        name = NamesProfileForm(data=request.POST,instance=user)
+        if form.is_valid() and name.is_valid():
+            skills = request.POST.get('skills')
+            profile.skills = skills
+            f = form.save()
+            n = name.save()
+            profile.save()
+            posted = True
+            return index(request)
+
+        else:
+            print (form.errors)
+    else:
+        name = NamesProfileForm()
+        form = UpdateProfileForm()
+        name.fields['first_name'].initial = user.first_name
+        name.fields['last_name'].initial = user.last_name
+        form.fields["description"].initial = profile.description
+
+
+    return render(request,'snatch/update_user_profile.html',{'name' : name,'form':form,'posted':posted,'title':title,'update':update,'languages':languages,'userSkills':userSkills})
+
+
+@login_required
+def update_company_profile(request):
+    update = True
+    user = User.objects.get(username = request.user)
+    profile = UserProfile.objects.get(user=user)
+    posted = False
+    if request.method == "POST":
+        form = EditCompanyProfileForm(request.POST,instance=profile)
+        name = CompanyNameForm(data=request.POST,instance=user)
+        if form.is_valid() and name.is_valid():
+            n = name.save(commit=False)
+            f = form.save()
+            name =  (request.POST['company_name'])
+            user.first_name = name
+            user.save()
+            posted = True
+            return index(request)
+        else:
+            print (form.errors)
+    else:
+        name = CompanyNameForm()
+        form = EditCompanyProfileForm()
+        name.fields['company_name'].initial = user.first_name
+        form.fields['description'].initial = profile.description
+    return render(request,'snatch/update_user_profile.html',{'name' : name,'form':form,'posted':posted,'update':update})
 
 #Used to create a company profile
 @login_required
 def create_company_profile(request):
     posted = False
+    update = False
     if request.method == "POST":
         form = CompanyProfileForm(request.POST, request.FILES)
         name = CompanyNameForm(data=request.POST)
+        print "HERE"
         if form.is_valid() and name.is_valid():
             pic = handle_uploaded_file(request.FILES['profile_picture'],False,request.user)
             f = form.save(commit=False)
@@ -213,12 +322,13 @@ def create_company_profile(request):
     else:
         name = CompanyNameForm()
         form = CompanyProfileForm()
-    return render(request,'snatch/new_user_profile.html',{'name' : name,'form':form,'posted':posted})
+    return render(request,'snatch/new_user_profile.html',{'name' : name,'form':form,'posted':posted,'update':update})
 
 
 @login_required
 def create_job(request):
     posted = False
+    states = getStates()
     if(is_employee(request.user)==False):
         return  HttpResponseRedirect('/snatch/denied')
     if request.method == "POST":
@@ -228,16 +338,17 @@ def create_job(request):
             user = User.objects.get(username=request.user)
             profile = UserProfile.objects.get(user=user)
             f.company = profile
+            location = request.POST.get('city') + ", " + request.POST.get('state')
+            f.location = location
             f.save()
+
             posted = True
 
         else:
             print (form.errors)
     else:
         form = CreateJobForm()
-    return render(request,'snatch/add_job.html',{'form':form,'posted':posted})
-
-
+    return render(request,'snatch/add_job.html',{'form':form,'posted':posted,'states':states})
 
 #A user login, need to implement more
 def user_login(request):
@@ -259,7 +370,16 @@ def user_login(request):
             return render(request,'snatch/signin.html',{})
 
 
-
+#Return list of states
+def getStates():
+    states = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut',
+            'Delaware', 'Florida', 'Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa',
+            'Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan',
+            'Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire',
+            'New Jersey','New Mexico','New York','North Carolina', 'North Dakota','Ohio','Oklahoma',
+            'Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas',
+            'Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin', 'Wyoming']
+    return states
 
 @login_required
 def user_logout(request):
@@ -267,11 +387,6 @@ def user_logout(request):
     print (request.user)
     logout(request)
     return HttpResponseRedirect('/snatch/')
-
-
-
-
-
 
 @login_required
 def changePassword(request):
@@ -289,3 +404,6 @@ def changePassword(request):
 			return render(request,'snatch/changePassword/confirm.html',{})
 
 	return render(request,'snatch/changePassword/changePassword.html',{'change_pass_user_form':  ChangePasswordUserForm()})
+
+def sendRef(request):
+	return render(request, 'snatch/changePassword/sendReferral.html')

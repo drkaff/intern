@@ -18,7 +18,7 @@ class CompanyJobsTable(tables.Table):
     job_type = tables.Column()
     added = tables.Column()
     title = tables.LinkColumn('job',  args=[A('id')], verbose_name='job', empty_values=())
-    delete = tables.LinkColumn('delete', args=[A('id')], verbose_name='delete', empty_values=(),orderable=False)
+#    delete = tables.LinkColumn('delete', args=[A('id')], verbose_name='delete', empty_values=(),orderable=False)
     #delete= tables.TemplateColumn(TEMPLATE)
     class Meta:
         model = Job

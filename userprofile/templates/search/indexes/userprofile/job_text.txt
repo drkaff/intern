@@ -1,0 +1,7 @@
+{{ object.company.user.first_name }}
+{{ object.title }}
+{{ object.description }}
+{{ object.location }}
+{{ object.skills }}
+{{ object.level }}
+{{ object.job_type}}

@@ -28,8 +28,7 @@
     {% block table.tbody %}
     <tbody>
         {% for row in table.page.object_list|default:table.rows %} {# support pagination #}
-        <h1>{{i}}</h1>
-        {% i++ %}
+
         {% block table.tbody.row %}
 
         <tr class="{% cycle "odd" "even" %}">

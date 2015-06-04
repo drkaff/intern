@@ -10,10 +10,7 @@
         background-color: #f5f5f5;
       }
 
-      .form-signin {
-        max-width: 300px;
-        padding: 19px 29px 29px;
-        margin: 0 auto 20px;
+   	  .form-signin {
         background-color: #fff;
         border: 1px solid #e5e5e5;
         -webkit-border-radius: 5px;
@@ -26,15 +23,60 @@
       .form-signin .form-signin-heading,
       .form-signin .checkbox {
         margin-bottom: 10px;
+		margin-left:22px;
       }
       .form-signin input[type="text"],
       .form-signin input[type="password"] {
         font-size: 16px;
         height: auto;
-        margin-bottom: 15px;
-        padding: 7px 9px;
+        padding: 11px 9px 10px 9px;
+		width:300px;
       }
-
+	.login{
+	  padding: 15px;
+	  width: 400px;
+	  min-height: 400px;
+	  margin: 2% auto 0 auto;
+	}
+	.login .heading { 
+	  margin-top: 1%;
+	}
+	.login .heading h2 {
+	  font-size: 3em;
+	  font-weight: 300;
+	  color: rgba(255, 255, 255, 0.7);
+	  display: inline-block;
+	  padding-bottom: 5px;
+	  text-shadow: 1px 1px 3px #23203b;
+	}
+	.login form input.form-control {
+	  display: block;
+	  width: auto;
+	  height: auto;
+	  border: none;
+	  outline: none;
+	  box-shadow: none;
+	  background: none;
+	  border-radius: 0px;
+	  padding: 10px;
+	  font-size: 1.6em;
+	  width: 100%;
+	  background: transparent;
+	  color: #c2b8b1;
+	}
+	.login form .input-group span {
+	  background: transparent;
+	  min-width: 53px;
+	  border: none;
+	  
+	}
+	.input-group {
+	  margin-bottom: 15px;
+	}
+	
+	.container.login-pag{
+	  margin-top:85px;
+	}
     </style>
     <link href="../assets/css/bootstrap-responsive.css" rel="stylesheet">
 
@@ -54,18 +96,24 @@
 
   {%block body_block %}
 
-    <div class="container">
-
+    <div class="container login-pag">
       <form class="form-signin" method="post" action="/snatch/login/">
-
-        <h2 class="form-signin-heading">Please sign in</h2>
+		<div class="login">
+		<div class="heading"><h2>Sign in</h2></div>
         {% csrf_token %}
-        <input type="text" name="username" class="input-block-level" placeholder="Username">
+		<div class="input-group input-group-lg">
+		<span class="input-group-addon text"><i class="fa fa-user"></i></span>
+        <input type="text" name="username" class="input-block-level" placeholder="Username" style="padding:10px 9px;">
+		</div>
+		<div class="input-group input-group-lg">
+		<span class="input-group-addon text"><i class="fa fa-lock"></i></span>
         <input type="password" name="password" class="input-block-level" placeholder="Password">
+		</div>
         <label class="checkbox">
           <input type="checkbox" value="remember-me"> Remember me
         </label>
         <input type="submit" value="Sign In" class="btn btn-large btn-primary" />
+		</div>
       </form>
 
     </div>
