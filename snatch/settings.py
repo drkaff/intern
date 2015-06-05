@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'bootstrap3',
     'bootstrapform',
     'haystack',
+	'django_wysiwyg',
 
 )
 

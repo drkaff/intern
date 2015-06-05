@@ -1,87 +1,87 @@
 {%extends "base.html" %}
 {% load staticfiles %}
 {% block body_block%}
+{% load wysiwyg %}
+
 
 
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Page Content -->
 <div class="container">
+	<!-- Profile Item Heading -->
 	<div class="row">
-		<div class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6">
-    	 <div class="well profile">
-            <div class="col-sm-12">
-                <div class="col-xs-12 col-sm-8">
-                    <h2>{{name}}</h2>
-                    <p><strong>About: </strong> {{description}} </p>
-                    <p><strong>Hobbies: </strong> Read, out with friends, listen to music, draw and learn new things. </p>
-                    <p><strong>Skills: </strong>
-											{%for skill in skills%}
+		<div class="col-lg-12">
+    	<div class="well profile page-header">
+                    <h2>{{name}} <small>{{user.type}}</small></h2>
+		</div>
+		</div>
+	</div>
+	<!-- Profile Item Row -->
+	<div class="row">
+		<div class="col-md-3">
+            <figure><img src={%static image%} alt="" style="width:100%;" ></figure>
+			<div class="prof-edit text-center">
+					<br>
+					{% load app_filters %}
+					{% if user|has_type:"ap" %}
+					<form action="/snatch/update_user_profile/">
+					<button class="btn btn-info btn-block"><span class="fa fa-user"></span> Edit Profile </button>
+					</form>
+					{%else%}
+					<form action="/snatch/update_company_profile/">
+					<button class="btn btn-info btn-block"><span class="fa fa-user"></span> Edit Profile </button>
+					</form>
+					{%endif%}
+            </div>
+        </div>
+		<div class="col-md-4">
+                    <h3>About: </h3> 
+					<p> {{description}} </p>
+                    <h3>Hobbies: </h3>
+ 					<p>Read, out with friends, listen to music, draw and learn new things. </p>
+                   <h3>Skills: </h3>
+					<p>	{%for skill in skills%}
                         <span class="tags">{{skill}},</span>
                         {%endfor%}
                     </p>
+        </div>
+                
+           
+		{%if company%}
+           <div class="col-xs-12 divider text-center">
+                <div class="col-xs-12 col-sm-2 emphasis">
+                <button class="btn btn-success btn-block"><span class="fa fa-plus-circle"></span> Follow </button>
                 </div>
-                <div class="col-xs-12 col-sm-4 text-center">
-                    <figure>
-                        <img src={%static image%} alt="" class="img-circle img-responsive">
-                    </figure>
-										<br>
-										{% load app_filters %}
-										{% if user|has_type:"ap" %}
-										<form action="/snatch/update_user_profile/">
-										<button class="btn btn-info btn-block"><span class="fa fa-user"></span> Edit Profile </button>
-									</form>
-									{%else%}
-									<form action="/snatch/update_company_profile/">
-									<button class="btn btn-info btn-block"><span class="fa fa-user"></span> Edit Profile </button>
-								</form>
-								{%endif%}
-                </div>
-            </div>
-						{%if company%}
-            <div class="col-xs-12 divider text-center">
-                <div class="col-xs-12 col-sm-4 emphasis">
-                    <button class="btn btn-success btn-block"><span class="fa fa-plus-circle"></span> Follow </button>
-                </div>
-								<div class="col-xs-12 col-sm-4 emphasis">
-										<form action="/snatch/company_jobs/{{pid}}/">
-                    <button class="btn btn-info btn-block"><span class="fa fa-user"></span> View Jobs </button>
-								</form>
-								</div>
-						{%else%}
-						<div class="col-xs-12 col-sm-4 emphasis">
-								<form action="/snatch/applied_to/">
-								<button class="btn btn-info btn-block"><span class="fa fa-user"></span> View Applied To</button>
-						</form>
-						</div>
-							{% endif %}
-								<!--
-                <div class="col-xs-12 col-sm-4 emphasis">
-                    <h2><strong>245</strong></h2>
-                    <p><small>Following</small></p>
-                    <button class="btn btn-info btn-block"><span class="fa fa-user"></span> View Profile </button>
-                </div>
-                <div class="col-xs-12 col-sm-4 emphasis">
-                    <h2><strong>43</strong></h2>
-                    <p><small>Snippets</small></p>
-                    <div class="btn-group dropup btn-block">
-                      <button type="button" class="btn btn-primary"><span class="fa fa-gear"></span> Options </button>
-                      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                        <span class="caret"></span>
-                        <span class="sr-only">Toggle Dropdown</span>
-                      </button>
-                      <ul class="dropdown-menu text-left" role="menu">
-                        <li><a href="#"><span class="fa fa-envelope pull-right"></span> Send an email </a></li>
-                        <li><a href="#"><span class="fa fa-list pull-right"></span> Add or remove from a list  </a></li>
-                        <li class="divider"></li>
-                        <li><a href="#"><span class="fa fa-warning pull-right"></span>Report this user for spam</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#" class="btn disabled" role="button"> Unfollow </a></li>
-                      </ul>
-                    </div>
-                </div>
-            </div> -->
-    	 </div>
+				<div class="col-xs-12 col-sm-2 emphasis">
+				<form action="/snatch/company_jobs/{{pid}}/">
+                <button class="btn btn-info btn-block"><span class="fa fa-user"></span> View Jobs </button>
+				</form>
+				</div>
+			</div>
+		{%else%}
+			<div class="col-xs-12 col-sm-2 emphasis">
+				<form action="/snatch/applied_to/">
+				<button class="btn btn-info btn-block"><span class="fa fa-user"></span> View Applied To</button>
+				</form>
+    	   </div>
+	   	{% endif %}
+	</div>
+	<!-- Profile Links Row -->
+	<div class="row">
+	<div class="post col-md-8">
+		<h2 class="title"><a href="#">Referals</a></h2>
+		&nbsp;
+		<div class="entry">
+			
+			<h3>What people are saying about you</h3>
+			<blockquote>{{ user1.referrer.post }}<br />- {{ user1.referrer }}</blockquote>
+            <blockquote>{{ user2.referrer.post }}<br />- {{ user2.referrer }}</blockquote>
 		</div>
+		<p class="links"><a href="{{ url.referrerRequest }}" class="more">Request Referal >></a></p>
+	</div>
 	</div>
 </div>
+
 </link>
 {% endblock %}
