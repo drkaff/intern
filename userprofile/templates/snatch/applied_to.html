@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Applied To{% endblock %}
+
+{% block body_block %}
+<h1>Applied To</h1>
+<ul class="list-group">
+  {% for u in users%}
+  <a href="{{u.get_absolute_url}}" class="list-group-item">{{u.user.first_name}}</a>
+</ul>
+  {%endfor%}
+{%endblock%}

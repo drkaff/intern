@@ -10,8 +10,8 @@
               {%if profile.registered %}
                 <p>REGISTERED</p>
                 {%endif %}
-              {% if user|has_type:"em" %} <p>User is employee</p>
-                  {% else %} <p>User is an applicant</p>
+              {% if user|has_type:"em" %} <p>User is employee</p> <a href="/snatch/create_company_profile">Create Profile</a>
+                  {% else %} <p>User is an applicant</p> <a href="/snatch/create_user_profile">Create Profile</a>
                  {% endif %}
             {% else %}
                 <h1>Welcome To Snatch!</h1>

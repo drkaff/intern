@@ -1,0 +1,11 @@
+Django
+pillow
+django-bootstrap3
+django-tables2
+whoosh
+pygments
+django-bootstrap-form
+django-wysiwyg
+django-haystack
+postgresql
+psycopg2

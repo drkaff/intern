@@ -1,6 +1,9 @@
 {%extends "base.html" %}
 {% load staticfiles %}
+{% load querystring from django_tables2 %}
+{% load trans blocktrans from i18n %}
 {% block body_block%}
+
 {% load wysiwyg %}
 
 
@@ -24,19 +27,15 @@
 			<div class="prof-edit text-center">
 					<br>
 					{% load app_filters %}
-					{% if user|has_type:"ap" %}
-					<form action="/snatch/update_user_profile/">
+					{%if owner%}
+					<form action="/snatch/update_profile/">
 					<button class="btn btn-info btn-block"><span class="fa fa-user"></span> Edit Profile </button>
-					</form>
-					{%else%}
-					<form action="/snatch/update_company_profile/">
-					<button class="btn btn-info btn-block"><span class="fa fa-user"></span> Edit Profile </button>
-					</form>
+				</form>
 					{%endif%}
             </div>
         </div>
 		<div class="col-md-4">
-                    <h3>About: </h3> 
+                    <h3>About: </h3>
 					<p> {{description}} </p>
                     <h3>Hobbies: </h3>
  					<p>Read, out with friends, listen to music, draw and learn new things. </p>
@@ -46,18 +45,18 @@
                         {%endfor%}
                     </p>
         </div>
-                
-           
+
+
 		{%if company%}
-           <div class="col-xs-12 divider text-center">
-                <div class="col-xs-12 col-sm-2 emphasis">
+           <div class="col-xs-12 col-sm-2 emphasis">
+                
                 <button class="btn btn-success btn-block"><span class="fa fa-plus-circle"></span> Follow </button>
-                </div>
-				<div class="col-xs-12 col-sm-2 emphasis">
+                
+				<br>
 				<form action="/snatch/company_jobs/{{pid}}/">
                 <button class="btn btn-info btn-block"><span class="fa fa-user"></span> View Jobs </button>
 				</form>
-				</div>
+				
 			</div>
 		{%else%}
 			<div class="col-xs-12 col-sm-2 emphasis">
@@ -70,18 +69,96 @@
 	<!-- Profile Links Row -->
 	<div class="row">
 	<div class="post col-md-8">
+		{%if company%}
+		{% block table %}
+		<h2 class="title"><a href="#">Jobs</a></h2>
+		&nbsp;
+		<table class="table table-striped"{% if table.attrs %} {{ table.attrs.as_html }}{% endif %}>
+		    {% block table.thead %}
+		    <thead>
+		        <tr>
+		        {% for column in table.columns %}
+		            {% if column.orderable %}
+		            <th {{ column.attrs.th.as_html }}><a href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}">{{ column.header }}</a></th>
+		            {% else %}
+		            <th {{ column.attrs.th.as_html }}>{{ column.header }}</th>
+		            {% endif %}
+		        {% endfor %}
+		        </tr>
+		    </thead>
+		    {% endblock table.thead %}
+		    {% block table.tbody %}
+		    <tbody>
+		        {% for row in table.page.object_list|default:table.rows %} {# support pagination #}
+
+		        {% block table.tbody.row %}
+
+		        <tr class="{% cycle "odd" "even" %}">
+		            {% for column, cell in row.items %}
+		            {% load app_filters %}
+		            {% if column|has_delete:"delete" %}
+		            <td><form id="delete" method="delete" action="delete/job{{job.id}}"><input type="submit" value="Delete" class="btn btn-large btn-primary" /></input></form></td>
+		            {%else%}
+		            <td {{ column.attrs.td.as_html }}>{{ cell }}</td>
+		            {%endif%}
+		            {% endfor %}
+		        </tr>
+		        {% endblock table.tbody.row %}
+		        {% empty %}
+		        {% if table.empty_text %}
+		        {% block table.tbody.empty_text %}
+		        <tr><td colspan="{{ table.columns|length }}">{{ table.empty_text }}</td></tr>
+		        {% endblock table.tbody.empty_text %}
+		        {% endif %}
+		        {% endfor %}
+		    </tbody>
+		    {% endblock table.tbody %}
+		</table>
+		{% endblock table %}
+		{%else%}
 		<h2 class="title"><a href="#">Referals</a></h2>
 		&nbsp;
 		<div class="entry">
-			
+
 			<h3>What people are saying about you</h3>
 			<blockquote>{{ user1.referrer.post }}<br />- {{ user1.referrer }}</blockquote>
             <blockquote>{{ user2.referrer.post }}<br />- {{ user2.referrer }}</blockquote>
 		</div>
-		<p class="links"><a href="{{ url.referrerRequest }}" class="more">Request Referal >></a></p>
+		<p class="links"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Request Referal >></button></p>
+			<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+							<h4 class="modal-title" id="exampleModalLabel">New message</h4>
+						</div>
+						<div class="modal-body">
+							<form method="POST">
+								<div class="form-group">
+									<label name= "Recipient" for="recipient-name" class="control-label">Recipient:</label>
+									<input type="text" class="form-control" id="recipient-name" value={{email}} >
+								</div>
+								<div class="form-group">
+									<label for="message-text" class="control-label">Message:</label>
+									<textarea name= "message" class="form-control" id="message-text"></textarea>
+								</div>
+						</div>
+						{% csrf_token %}
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							<input type="submit" class="btn btn-primary" value="Send Message"/>
+						</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
 	</div>
 	</div>
 </div>
 
 </link>
 {% endblock %}
+
+
+		

@@ -15,7 +15,7 @@
     {% block head %}{% endblock %}
     <title>Snatch | {% block title %}Find Your Snatch!{% endblock %}</title>
 
-    <!-- Bootstrap Core CSS -->	
+    <!-- Bootstrap Core CSS -->
     <link href="{% static "css/bootstrap.min.css"%}" rel="stylesheet">
     <link href="http://getbootstrap.com/examples/dashboard/dashboard.css" rel="stylesheet">
 
@@ -46,20 +46,21 @@
                           <li><a href="/snatch/logout/">Logout</a></li>
                           {% load app_filters %}
                           {% if user|has_type:"em" %}
-                          <li><a href="/snatch/create_job/">Post Job</a></li>
+                              <li><a href="/snatch/create_job/">Post Job</a></li>
+                              <li><a href="/snatch/company_jobs/"> View Jobs</a></li>
+							  
+                              {% if user.registered == False%}
+                                  <li><a href="/snatch/create_company_profile">Create Profile</a></li>
+                              {%endif%}
+                          {%else%}
+                              {% if  user.registered == False%}
+                                <li><a href="/snatch/create_user_profile">Create Profile</a></li>
+                              {%else%}
+                            <!--  <li><a href="/snatch/profile_quiz">Quizzes</a></li> -->
+                              <li><a href="/snatch/jobs">View Jobs</a></li>
 
-                          <li><a href="/snatch/company_jobs/"> View Jobs</a></li>
-                          {% if not user.registered%}
-                          <li><a href="/snatch/create_company_profile">Create Profile</a></li>
+                              {% endif %}
                           {%endif%}
-                          {% else %}
-                          <li><a href="/snatch/profile">Profile</a></li>
-                          {% if user.registered%}
-                          <li><a href="/snatch/create_user_profile">Create Profile</a></li>
-                          {%endif%}
-                          <li><a href="/snatch/profile_quiz">Quizzes</a></li>
-                          <li><a href="/snatch/jobs">View Jobs</a></li>
-                           {% endif %}
                     {% else %}
                         <li><a href="/snatch/register/">Register Here</a></li>
                         <li><a href="/snatch/login/">Login</a></li>
@@ -77,12 +78,20 @@
         <div class="col-lg-12">
            <div>
                 {% block body_block %}{% endblock %}
+				
            </div>
         </div>
       </div>
     </div>
 
     <footer>
+		<div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <span class="copyright">Copyright &copy; Snatch 2015 <a href="/snatch/legal/">Legal</a></span>
+				</div>
+			</div>
+		</div>
       {% block footer%}{% endblock%}
 
       <footer>

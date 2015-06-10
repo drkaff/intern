@@ -59,7 +59,7 @@ class CreateProfileForm(forms.ModelForm):
 
     resume = forms.FileField()
     profile_picture = forms.ImageField()
-    description = forms.CharField(widget=forms.Textarea)
+    description = forms.CharField()
 #    def __init__(self, *args, **kwargs):
 #        LEXERS = [item for item in get_all_lexers() if item[1]]
 #        LANGUAGE_CHOICES = sorted([(item[1][0], item[0]) for item in LEXERS])

@@ -4,52 +4,77 @@
 
 {% block body_block %}
 <script>
-function finish() {
-	var results = new Array("1","2","3","4","5","6","7","8","9","10","11","12");
 
-	/// 1=None, 2=Creative, 3=Logical, 4=Problem Solver, 5=Communicator, 6=Listener, 7=Accurate, 8=Efficient, 9=Team Leader, 10=Team Member, 11=Analytical, 12=Risk-Taker
+$( function() {
 
-	var nums = new Array(12);
-	for(var i = 0; i < nums.length; i++) nums[i] = 0;
-	for(var i = 1; i <= 22; i++) {
-		var q = document.forms['quiz'].elements['question_'+i];
-		if(q[0].type=='checkbox') {
-			var n = 0;
-		}
-		for(var j = 0; j < q.length; j++) {
-			if(q[j].checked) {
-				var a = q[j].value.split(',');
-				for(var k = 0; k < a.length; k++) {
-					nums[a[k]]++;
-				}
-				if(q[j].type=='radio') break;
-				else n++;
+	$('#quiz').submit( function(party) {
+
+		party.preventDefault();
+
+		var results = new Array("1","2","3","4","5","6","7","8","9","10","11","12");
+
+		/// 1=None, 2=Creative, 3=Logical, 4=Problem Solver, 5=Communicator, 6=Listener, 7=Accurate, 8=Efficient, 9=Team Leader, 10=Team Member, 11=Analytical, 12=Risk-Taker
+
+		var nums = new Array(12);
+		for(var i = 0; i < nums.length; i++) nums[i] = 0;
+		for(var i = 1; i <= 22; i++) {
+			var q = document.getElementById('quiz').elements['question_'+i];
+			if(q[0].type=='checkbox') {
+				var n = 0;
 			}
-			if(j == q.length-1&&q[j].type=='radio') {nums[0]++;}
+			for(var j = 0; j < q.length; j++) {
+				if(q[j].checked) {
+					var a = q[j].value.split(',');
+					for(var k = 0; k < a.length; k++) {
+						nums[a[k]]++;
+					}
+					if(q[j].type=='radio') break;
+					else n++;
+				}
+				if(j == q.length-1&&q[j].type=='radio') {nums[0]++;}
+			}
+			if(q[0].type=='checkbox'&&((document.forms['quiz'].elements['question_'+i+'_min']&&n<document.forms['quiz'].elements['question_'+i+'_min'].value)||(document.forms['quiz'].elements['question_'+i+'_max']&&n>document.forms['quiz'].elements['question_'+i+'_max'].value))) nums[0]++;
 		}
-		if(q[0].type=='checkbox'&&((document.forms['quiz'].elements['question_'+i+'_min']&&n<document.forms['quiz'].elements['question_'+i+'_min'].value)||(document.forms['quiz'].elements['question_'+i+'_max']&&n>document.forms['quiz'].elements['question_'+i+'_max'].value))) nums[0]++;
-	}
-	var j = new Array('0');
-	for (i in nums) if(nums[i]>nums[j[0]]){j=new Array(''+i);} else if(nums[i]==nums[j[0]])j[j.length] = i;
-	//var o = '';for(var i in results)o+=results[i]+'='+nums[i]+'\n';
-	//alert(o);
-	if(nums[0]!=0) {
-		alert('You missed or incorrectly answered '+nums[0]+' questions!');
-	}
-	else if(j[0]==0) {
-		alert('No result could be determined.');
-	}
-	else {
-		alert(results[j[0]]);
-	///This is where the jQuery will need to send the variable to our backend
-	}
-}
+		var j = new Array('0');
+		for (i in nums) if(nums[i]>nums[j[0]]){j=new Array(''+i);} else if(nums[i]==nums[j[0]])j[j.length] = i;
+		//var o = '';for(var i in results)o+=results[i]+'='+nums[i]+'\n';
+		//alert(o);
+		if(nums[0]!=0) {
+			alert('You missed or incorrectly answered '+nums[0]+' questions!');
+		}
+		else if(j[0]==0) {
+			alert('No result could be determined.');
+		}
+		else {
+			// alert(results[j[0]]);
+			//alert('yes');
+			'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val(),
+
+			var quizno = results[j[0]];
+			alert(quizno);
+			$.ajax({
+				type: 'POST',
+				data: 'quizno=' + quizno,
+				url: $('#quiz').attr('action'),
+				success: function(data) {
+					console.log(data);
+					if(parseInt(data) > 0 && parseInt(data) < 13) {
+						$('#quiz').html('<p><em>Thanks for taking the personality quiz! Your results have been recorded!</em></p><a href="/snatch/profile">Return to my profile</a></em></p>');
+					}
+				}
+			});
+		}
+	});
+
+});
 </script>
 </head>
 <body>
-<form name="quiz" action="javascript:finish();">
+	{% csrf_token %}
+
+<form name="quiz" id="quiz" method="post" action="/snatch/profile_quiz/">
 <fieldset style="width:300px;">
-<legend><strong>How did you find Snatch.com?</strong> </legend>
+<legend><strong>How did you find Snatch.com? {{something}}</strong> </legend>
 <font size="2" face="Verdana">
 <input name="question_1" type="radio" value="4"> A friend</font><br /><font size="2" face="Verdana">
 <input name="question_1" type="radio" value="5"> An advertisement</font><br /><font size="2" face="Verdana">

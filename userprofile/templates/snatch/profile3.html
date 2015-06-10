@@ -1,0 +1,103 @@
+{%extends "base.html" %}
+{% load staticfiles %}
+{% block body_block%}
+{% load wysiwyg %}
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+<div class="container">
+	<div class="row">
+		<div class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6">
+    	 <div class="well profile">
+            <div class="col-sm-12">
+                <div class="col-xs-12 col-sm-8">
+                    <h2>{{name}}</h2>
+                    <p><strong>About: </strong> {{description}} </p>
+                    <p><strong>Skills: </strong>
+                        <span class="tags">html5</span>
+                        <span class="tags">css3</span>
+                        <span class="tags">jquery</span>
+                        <span class="tags">bootstrap3</span>
+                    </p>
+                </div>
+                <div class="col-xs-12 col-sm-4 text-center">
+                    <figure>
+                        <img src={%static image%} alt="" class="img-circle img-responsive">
+                    </figure>
+										<br>
+                    {%if owner%}
+                    <form action="/snatch/update_profile/">
+										<button class="btn btn-info btn-block"><span class="fa fa-user"></span> Edit Profile </button>
+                  </form>
+                  {%endif%}
+                </div>
+            </div>
+            <div class="col-xs-12 divider text-center">
+                <div class="col-xs-12 col-sm-4 emphasis">
+
+                    <button class="btn btn-success btn-block"><span class="fa fa-plus-circle"></span> Follow </button>
+                </div>
+                <div class="col-xs-12 col-sm-4 emphasis">
+
+                    {%if company%}
+                    <form action="/snatch/company_jobs/{{pid}}/">
+                      <button class="btn btn-info btn-block"><span class="fa fa-user"></span> View Jobs </button>
+                    </form>
+                    {%else%}
+                    <form action="/snatch/applied_to{{pid}}/">
+                      <button class="btn btn-info btn-block"><span class="fa fa-user"></span> View Applied To </button>
+                    </form>
+                    {%endif%}
+                </div>
+                <div class="col-xs-12 col-sm-4 emphasis">
+
+                    {%if not owner%}
+
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Send Messagee</button>
+
+          					<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          						<div class="modal-dialog">
+          							<div class="modal-content">
+          								<div class="modal-header">
+          									<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          									<h4 class="modal-title" id="exampleModalLabel">New message</h4>
+          								</div>
+          								<div class="modal-body">
+          									<form method="POST">
+          										<div class="form-group">
+          											<label name= "Recipient" for="recipient-name" class="control-label">Recipient:</label>
+          											<input type="text" class="form-control" id="recipient-name" value={{email}} readonly>
+          										</div>
+          										<div class="form-group">
+          											<label for="message-text" class="control-label">Message:</label>
+          											<textarea name= "message" class="form-control" id="message-text"></textarea>
+          										</div>
+          								</div>
+          								{% csrf_token %}
+          								<div class="modal-footer">
+          									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          									<input type="submit" class="btn btn-primary" value="Send Message"/>
+          								</form>
+          								</div>
+          							</div>
+          						</div>
+          					</div>
+                    {%endif%}
+                </div>
+            </div>
+    	 </div>
+       {%if not company%}
+       <div class="row">
+     	<div class="post col-md-8">
+     		<h2 class="title"><a href="#">Referals</a></h2>
+     		&nbsp;
+     		<div class="entry">
+
+     			<h3>What people are saying about you</h3>
+     			<blockquote>{{ user1.referrer.post }}<br />- {{ user1.referrer }}</blockquote>
+                 <blockquote>{{ user2.referrer.post }}<br />- {{ user2.referrer }}</blockquote>
+     		</div>
+     		<p class="links"><a href="{{ url.referrerRequest }}" class="more">Request Referal >></a></p>
+     	</div>
+     	</div>
+     </div>
+     {%endif%}
+{%endblock%}

@@ -11,8 +11,13 @@ from smtplib import SMTP
 import os
 from pygments.lexers import get_all_lexers
 from pygments.lexers import get_lexer_by_name
-
-
+from django.views.decorators.csrf import csrf_exempt
+from collections import defaultdict
+def test(request):
+    items =  ['Efficient','Multi-tasker','Problem Solver','Punctual','Research',
+              'Planning','Leading','Teamwork','Client Relationships','Sales',
+              'Administration','Bookkeeping','Lecture','Human Resource Management']
+    return render(request,'snatch/test.html',{'items':items})
 
 
 def index(request):
@@ -20,7 +25,7 @@ def index(request):
         user = User.objects.get(username=request.user)
         up = UserProfile.objects.get(user=user)
         if(up.registered == True):
-            return profile(request)
+            return profile(request,user.id)
         else:
             return render(request,'snatch/index.html')
     else:
@@ -29,12 +34,24 @@ def index(request):
 def denied(request):
     return render(request,'snatch/denied.html',{})
 
-def quiz(request):
-    return render(request,'snatch/profile_quiz.html',{})
+def legal(request):
+	return render(request,'snatch/legal.html')
 
+@csrf_exempt
+def quiz(request):
+    if request.method == "POST":
+        quizno = request.POST.get('quizno')
+        # INSERT QUIZNO INTO USER PROFILE COLUMN
+        return HttpResponse("%s" % quizno)
+    else:
+        return render(request,'snatch/profile_quiz.html',{})
 
 @login_required
 def company_profile(request,company_id):
+    access = User.objects.get(username=request.user)
+    owner = False
+    if(access.id == company_id):
+        owner = True
     company = get_object_or_404(UserProfile,pk=company_id)
     user = company.user
     image = company.profile_picture
@@ -42,31 +59,42 @@ def company_profile(request,company_id):
     fname = user.first_name
     name = fname
     image = image.url[19:]
-    company = True
-    return render(request,'snatch/profile.html',{'image':image,'description':description,'name':name,'company':company,'company_id':company_id})
+    email = user.email
+    pid = company_id
+    return render(request,'snatch/profile.html',{'image':image,'description':description,'name':name,'company':company,'company_id':company_id,'owner':owner,'email':email,'pid':pid})
 
 
 @login_required
-def profile(request):
-    user = User.objects.get(username = request.user)
+def profile(request,user_id):
+    access = User.objects.get(username=request.user)
+    user = User.objects.get(pk=user_id)
     profile = UserProfile.objects.get(user=user)
+    email = user.email
     pid = profile.id
+    owner = False
+    if(access.id == user_id):
+        owner = True
     image = profile.profile_picture
     description = profile.description
-    fname = user.first_name
-    lname = user.last_name
-    name = fname + " " + lname
+    name = user.first_name + " " + user.last_name
     image = image.url[19:]
     skills = profile.skills
     skills = skills.split(',')
-    if(skills[len(skills)-1] == " "):
-        skills.pop()
+    skills = skills
     is_company = profile.user_type
+    print request.method
+    if(owner == False):
+        if request.method == 'POST':
+            message = request.POST.get("message")
+            if(message != ""):
+                send_email(email,message)
     if(is_company=="em"):
         company = True
     else:
         company = False
-    return render(request,'snatch/profile.html',{'image':image,'description':description,'name':name,'company':company,'skills':skills,'pid':pid})
+    return render(request,'snatch/profile.html',{'image':image,'description':description,'name':name,'company':company,'skills':skills,'pid':pid,'owner':owner,'email':email})
+
+
 
 #this is a change
 #A compnay's job page
@@ -77,7 +105,7 @@ def company_jobs(request,company_id):
     table = CompanyJobsTable(jobs)
     RequestConfig(request).configure(table)
     print company_id
-    return render(request, 'snatch/view_jobs.html', {'table': table,'company_id':company_id})
+    return render(request, 'snatch/view_jobs.html', 'snatch/profile.hmtl', {'table': table,'company_id':company_id})
 
 @login_required
 def company_only_jobs(request):
@@ -98,13 +126,18 @@ def view_jobs(request):
 
 #view applied to jobs
 @login_required
-def view_applied(request):
-    user = User.objects.get(username=request.user)
+def view_applied(request,user_id):
+    user = User.objects.get(id=user_id)
     profile = UserProfile.objects.get(user=user)
     jobs = Job.objects.all().filter(applied=profile)
     table = AppJobsTable(jobs)
-    return render(request, 'snatch/view_jobs.html',{'table':table, 'jobs':jobs})
+    pid = user_id
+    return render(request, 'snatch/view_jobs.html',{'table':table, 'jobs':jobs,'pid':pid})
 
+def view_users_applied(request,job_id):
+    job = Job.objects.get(pk=job_id)
+    users = job.applied.all()
+    return render(request, 'snatch/applied_to.html',{'users':users})
 
 
 #View for individual job
@@ -231,6 +264,14 @@ def getLanguages():
         languages.append("%s" % i[0])
     return languages
 
+@login_required
+def update_profile(request):
+    user = User.objects.get(username=request.user)
+    profile = UserProfile.objects.get(user=user)
+    if(profile.user_type=="em"):
+        return update_company_profile(request)
+    elif(profile.user_type=="ap"):
+        return update_user_profile(request)
 
 @login_required
 def update_user_profile(request):
@@ -242,7 +283,6 @@ def update_user_profile(request):
     title = "Update Profile"
     languages = getLanguages()
     userSkills = profile.skills
-    print languages
     if request.method == "POST":
         form = CreateProfileForm(request.POST,instance=profile)
         name = NamesProfileForm(data=request.POST,instance=user)
@@ -404,6 +444,40 @@ def changePassword(request):
 			return render(request,'snatch/changePassword/confirm.html',{})
 
 	return render(request,'snatch/changePassword/changePassword.html',{'change_pass_user_form':  ChangePasswordUserForm()})
-
+@login_required
 def sendRef(request):
-	return render(request, 'snatch/changePassword/sendReferral.html')
+    if request.method == 'POST':
+        user = User.objects.get(username=request.user)
+        fname = user.first_name
+        lname = user.last_name
+        name = fname + lname
+        email = request.POST.get('email')
+        message = "User "+ name + " has requested a referral!"
+        send_email(email, message)
+
+    return render(request, 'snatch/changePassword/send_Referral.html')
+
+@login_required
+def get_suggested(request,job_id):
+    job = Job.objects.get(id=job_id)
+    users = job.applied.all()
+    cult = job.culture
+    d = defaultdict(list)
+    for u in users:
+        count = get_difference(u.culture,cult)
+        if(count < 2):
+            d[count].append(u)
+    print d
+def get_difference(a,b):
+    s = set(b)
+    temp3 = [x for x in a if x not in s]
+    return len(temp3)
+    #send an email to the user
+def send_email(email,message):
+    server = SMTP("smtp.gmail.com",587) #gmail server
+    server.starttls() #connect to server
+    server.login('snatchtest1@gmail.com','password12345!')  #login to server
+    try:
+        server.sendmail('Snatch',email,message) # send message
+    finally:
+        server.close() #disconnect from server

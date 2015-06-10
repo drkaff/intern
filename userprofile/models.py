@@ -27,9 +27,10 @@ class UserProfile(models.Model):
     skills = models.CharField(max_length=300)#list of skills
     description = models.CharField(max_length=300,default="")
     resume = models.FileField(null=True,upload_to=upload_to_img) #holds the resume
-    profile_picture = models.ImageField(default='files/default.jpeg',upload_to=upload_to_res)
+    profile_picture = models.ImageField(default='static/files/default.jpeg',upload_to=upload_to_res)
     registered = models.BooleanField(default=False)
-    #get user skills, skills is a string and must be converted to list
+    culture = models.CharField(max_length=200)
+    quiz = models.CharField(max_length=50)    #get user skills, skills is a string and must be converted to list
     def get_skills(self):
         if (self.skills is not None):
             skills = self.skills
@@ -71,6 +72,9 @@ class UserProfile(models.Model):
             name+=lname
         return name
 
+    def get_absolute_url(self):
+        return "/snatch/profile%s" % self.id
+
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
@@ -109,7 +113,8 @@ class Job(models.Model):
     applied = models.ManyToManyField(UserProfile,related_name = 'applicants') #many user can apply to job
     level = models.CharField(max_length=2,choices=JOB_LEVEL) #level of job
     job_type = models.CharField(max_length=2,choices=JOB_TYPE) #type of job
-
+    culture = models.CharField(max_length=200)
+    quiz = models.CharField(max_length=50)
 
     def __str__(self):
         return self.title

@@ -54,6 +54,7 @@ $(function() {
 
 
 {% load bootstrap %}
+{% load wysiwyg %}
 
 {% block body_block %}
         <h1>{{title}}</h1>
@@ -72,8 +73,12 @@ $(function() {
             {% csrf_token %}
             {{ name|bootstrap }}
             {{ form|bootstrap }}
-
-
+			{% wysiwyg_setup %}
+			<div class="ui-widget form-group">
+                <label for="skills">Description:</label>
+                <textarea id="foo"><input name="skills" id="wysdes" size="50" class="form-control"></textarea>
+              </div>
+			{% wysiwyg_editor "foo" %}
             <div class="ui-widget">
               <label for="skills">Enter Skills:</label>
               <input name="skills" id="tags" size="50" class="form-control">
@@ -82,6 +87,7 @@ $(function() {
               var elem = document.getElementById("tags");
               elem.value = "{{userSkills}}";
               </script>
+			<br/>
             <div class="form-group">
               <form action="/snatch/profile">
                 <button type="submit" class="btn btn-primary">Submit</button>

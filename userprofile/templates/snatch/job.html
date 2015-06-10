@@ -5,9 +5,17 @@
   <h1>{{job.comapny.user.first_name}}</h1>
   <p>{{job.description}}</p>
   {% if owner %}
+  <div class="col-xs-12 col-sm-2 emphasis">
   <form id="delete" method="delete" action="/snatch/delete/job{{job.id}}">
     <input type="submit" value="Delete" class="btn btn-large btn-primary" /></input>
 </form>
+</div>
+<div class="col-xs-12 col-sm-2 emphasis">
+<form id="applied" method="applied" action="/snatch/applied_to{{job.id}}">
+  <input type="submit" value="Applied" class="btn btn-large btn-primary" /></input>
+</form>
+</div>
+
 {%endif%}
 {% load app_filters %}
 {% if user|has_type:"ap" %}

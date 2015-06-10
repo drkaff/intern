@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI Sortable - Connect lists</title>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <style>
+  #sortable1, #sortable2 {
+    border: 1px solid #eee;
+    width: 142px;
+    min-height: 20px;
+    list-style-type: none;
+    margin: 0;
+    padding: 5px 0 0 0;
+    float: left;
+    margin-right: 10px;
+  }
+  #sortable1 li, #sortable2 li {
+    margin: 0 5px 5px 5px;
+    padding: 5px;
+    font-size: 1.2em;
+    width: 120px;
+  }
+  </style>
+  <script>
+  $(function() {
+    $( "#sortable1, #sortable2" ).sortable({
+      connectWith: ".connectedSortable"
+    }).disableSelection();
+    $( "#sortable2" ).on( "sortreceive", function(event, ui) {
+       if($("#sortable2 li").length > 5){
+           $(ui.sender).sortable('cancel');
+       }
+   });
+   $("#sortable2").sortable(
+ 				{
+ 					receive : function(event, ui) {
+ 				                console.log($(this).data().sortable.currentItem);
+ 						return true;
+ 					}
+ 				}).disableSelection();
+  });
+  </script>
+</head>
+<body>
+
+
+<ul id="sortable1" class="connectedSortable">
+  {%for item in items%}
+  <li class="ui-state-default">{{item}}</li>
+  {%endfor%}
+</ul>
+
+<ul id="sortable2" class="connectedSortable">
+
+</ul>
+
+
+</body>
+</html>
